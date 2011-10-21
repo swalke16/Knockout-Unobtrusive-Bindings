@@ -2,7 +2,6 @@ ko.bindingProvider.instance = viewModelBindingProvider
 
 var viewModel = {
   bindings: {
-    '#contact_form':  'submit:    this.addContact',
     '#contact_form':  'submit:    addContact',
     '#name':          'value:     newContact.name',
     '#phone_number':  'value:     newContact.phone_number',
