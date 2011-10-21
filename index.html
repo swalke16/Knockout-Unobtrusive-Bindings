@@ -2,6 +2,7 @@
   <head>
     <script type='text/javascript' language="javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
     <script type='text/javascript' language="javascript" src="javascripts/knockout.js"></script>
+    <script type='text/javascript' language="javascript" src="javascripts/knockout.ViewModelBindingProvider.js"></script>
 
     <script type="text/html" id="contactTemplate">
       <tr>
@@ -24,120 +25,15 @@
 
     <table>
       <thead>
-          <tr>
-              <th>Name</th>
-              <th>Phone</th>
-          </tr>
+        <tr>
+          <th>Name</th>
+          <th>Phone</th>
+        </tr>
       </thead>
       <tbody id="contact_list"></tbody>
     </table>
 
-
-    <script>
-      // TODO: consider using jQuery.is() on each node to allow complex bindings expressions?
-      // TODO: binding of sub templates?
-
-      var viewModelBindingProvider = {
-        nodeHasBindings: function(node, viewModel) {
-          if (!node.getAttribute) return false; // not an element
-          console.log(node.getAttribute('class'))
-          return this.hasBindings(node, viewModel);
-        },
-
-        getBindings: function(node, bindingContext) {
-          var viewModel = bindingContext.$data;
-          var bindingKeys = this.bindingKeys(node);
-          var bindingStrings = [];
-
-          for (var i = 0, j = bindingKeys.length; i < j; i++) {
-            var bindingAccessor = viewModel.bindings[bindingKeys[i]];
-            if (bindingAccessor) bindingStrings.push(bindingAccessor);
-          }
-
-          return bindingStrings.length > 0 ? this.parseBindingsString(bindingStrings.join(' '), bindingContext)
-                                           : null;
-        },
-
-        // The following function is only used internally by this default provider.
-        // It's not part of the interface definition for a general binding provider.
-        parseBindingsString: function(bindingsString, bindingContext) {
-            try {
-                var viewModel = bindingContext['$data'];
-                var rewrittenBindings = " { " + ko.jsonExpressionRewriting.insertPropertyAccessorsIntoJson(bindingsString) + " } ";
-                return ko.utils.evalWithinScope(rewrittenBindings, viewModel === null ? window : viewModel, bindingContext);
-            } catch (ex) {
-                throw new Error("Unable to parse bindings.\nMessage: " + ex + ";\nBindings value: " + bindingsString);
-            }
-        },
-
-        hasBindings: function(node, viewModel){
-          if (!viewModel['bindings']) return false;
-
-          var bindingKeys = this.bindingKeys(node);
-
-          for (var i = 0, j = bindingKeys.length; i < j; i++) {
-            if (viewModel.bindings[bindingKeys[i]]) return true;
-          }
-
-          return false;
-        },
-
-        bindingKeys: function(node){
-          return Array.prototype.concat(this.getIdBindingKeys(node),
-                                        this.getTagBindingKeys(node),
-                                        this.getClassBindingKeys(node));
-        },
-
-        getIdBindingKeys: function(node){
-          return node.id ? ['#' + node.id] : [];
-        },
-
-        getTagBindingKeys: function(node){
-          return node.tagName ? [node.tagName.toLowerCase()] : [];
-        },
-
-        getClassBindingKeys: function(node){
-          var classes = node.getAttribute("class")
-                            ? node.getAttribute("class").split(' ')
-                            : [];
-
-          for (var i = 0, j = classes.length; i < j; i++) {
-            classes[i] = '.' + classes[i];
-          }
-
-          return classes;
-        }
-
-      };
-
-      ko.bindingProvider.instance = viewModelBindingProvider
-
-
-      var viewModel = {
-        bindings: {
-          '#contact_form':  'submit: this.addContact',
-          '#contact_form':  'submit: addContact',
-          '#name':          'value: newContact.name',
-          '#phone_number':  'value: newContact.phone_number',
-          '.name':          'text: name',
-          '.phone_number':  'text: phone_number',
-          '#add_contact':   'enable: allowAdd()',
-          '#contact_list':  'template: {name: "contactTemplate", foreach: contacts}'
-        },
-
-        newContact: {name: ko.observable(""), phone_number: ko.observable("")},
-        contacts: ko.observableArray(),
-        addContact: function(){
-          viewModel.contacts.push({name: viewModel.newContact.name(), phone_number: viewModel.newContact.phone_number()});
-          viewModel.newContact.name("").phone_number("");
-        },
-        allowAdd: function(){
-          return viewModel.newContact.name().length > 0 && viewModel.newContact.phone_number().length > 0;
-        }
-      };
-
-      ko.applyBindings(viewModel);
-    </script>
+    <script type='text/javascript' language='javascript' src="javascripts/bootstrap.js"></script>
 
   </body>
 
