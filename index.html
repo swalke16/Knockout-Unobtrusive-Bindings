@@ -34,12 +34,13 @@
 
 
     <script>
-      // TODO: allow element type bindings
+      // TODO: consider using jQuery.is() on each node to allow complex bindings expressions?
       // TODO: binding of sub templates?
 
       var viewModelBindingProvider = {
         nodeHasBindings: function(node, viewModel) {
           if (!node.getAttribute) return false; // not an element
+          console.log(node.getAttribute('class'))
           return this.hasBindings(node, viewModel);
         },
 
@@ -83,11 +84,16 @@
 
         bindingKeys: function(node){
           return Array.prototype.concat(this.getIdBindingKeys(node),
+                                        this.getTagBindingKeys(node),
                                         this.getClassBindingKeys(node));
         },
 
         getIdBindingKeys: function(node){
           return node.id ? ['#' + node.id] : [];
+        },
+
+        getTagBindingKeys: function(node){
+          return node.tagName ? [node.tagName.toLowerCase()] : [];
         },
 
         getClassBindingKeys: function(node){
