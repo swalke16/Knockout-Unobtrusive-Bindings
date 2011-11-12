@@ -1,5 +1,3 @@
-ko.bindingProvider.instance = viewModelBindingProvider
-
 var viewModel = {
   bindings: {
     '#contact_form':  'submit:    addContact',
@@ -22,4 +20,5 @@ var viewModel = {
   }
 };
 
+ko.bindingProvider.instance = viewModelBindingProvider
 ko.applyBindings(viewModel);

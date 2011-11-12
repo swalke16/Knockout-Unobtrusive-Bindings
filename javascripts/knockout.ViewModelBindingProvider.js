@@ -2,15 +2,18 @@
 // TODO: binding of sub templates?
 
 var viewModelBindingProvider = {
-  nodeHasBindings: function(node, viewModel) {
+  nodeHasBindings: function(node, bindingContext) {
     if (!node.getAttribute) return false; // not an element
-    return this.hasBindings(node, viewModel);
+    return this.hasBindings(node, bindingContext);
   },
 
   getBindings: function(node, bindingContext) {
     var viewModel = bindingContext.$data;
     var bindingKeys = this.bindingKeys(node);
     var bindingStrings = [];
+
+    if (node.id == 'contact_form') debugger;
+
 
     for (var i = 0, j = bindingKeys.length; i < j; i++) {
       /* var bindingAccessor = viewModel.bindings[bindingKeys[i]]; */
@@ -24,7 +27,7 @@ var viewModelBindingProvider = {
   },
 
   recursiveGetBindingAccessor: function(bindingKey, bindingContext){
-    var bindingSources = [].concat.apply([bindingContext.$data], bindingContext.$parents);
+    var bindingSources = this.bindingSources(bindingContext);
     for(var i = 0, j = bindingSources.length; i < j; i++){
       bindingSource = bindingSources[i];
       if (bindingSource['bindings'] && bindingSource.bindings[bindingKey]){
@@ -46,13 +49,25 @@ var viewModelBindingProvider = {
     }
   },
 
-  hasBindings: function(node, viewModel){
-    if (!viewModel['bindings']) return false;
+  // TODO: refactor this to return the actual bindings collections in order of context -> context.$data -> context.$parents
+  bindingSources: function(bindingContext) {
+    var bs = [].concat.apply([bindingContext]);
+    bs = bs.concat(bindingContext.$data ? [bindingContext.$data] : []);
+    bs = bs.concat(bindingContext.$parents ? bindingContext.$parents : []);
+    return bs;
+  },
 
+  hasBindings: function(node, bindingContext){
     var bindingKeys = this.bindingKeys(node);
+    var bindingSources = this.bindingSources(bindingContext);
 
-    for (var i = 0, j = bindingKeys.length; i < j; i++) {
-      if (viewModel.bindings[bindingKeys[i]]) return true;
+    for(var k = 0, l = bindingKeys.length; k < l; k++){
+      var bindingKey = bindingKeys[k];
+
+      for(var i = 0, j = bindingSources.length; i < j; i++){
+        var bindingSource = bindingSources[i];
+        if (bindingSource['bindings'] && bindingSource.bindings[bindingKey]) return true;
+      }
     }
 
     return false;
